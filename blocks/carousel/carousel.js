@@ -132,23 +132,52 @@ function initSpotlight(block) {
   const ul = block.querySelector('ul');
   if (!ul) return;
 
-  function updateSpotlight() {
+  const items = [...ul.children];
+  if (items.length === 0) return;
+
+  let currentIndex = 0;
+
+  function applyActive(idx) {
+    items.forEach((item, i) => item.classList.toggle('spotlight-active', i === idx));
+  }
+
+  function scrollToIndex(idx) {
+    const item = items[idx];
+    if (!item) return;
+    const target = item.offsetLeft - (ul.clientWidth - item.offsetWidth) / 2;
+    ul.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+  }
+
+  function setActive(idx) {
+    currentIndex = Math.max(0, Math.min(idx, items.length - 1));
+    applyActive(currentIndex);
+    scrollToIndex(currentIndex);
+  }
+
+  // Replace buttons so slider.js transform-based handlers are removed
+  ['next', 'prev'].forEach((cls) => {
+    const btn = block.querySelector(`button.${cls}`);
+    if (!btn) return;
+    const fresh = btn.cloneNode(true);
+    btn.replaceWith(fresh);
+    fresh.addEventListener('click', () => setActive(cls === 'next' ? currentIndex + 1 : currentIndex - 1));
+  });
+
+  // Update spotlight on touch/swipe scroll
+  ul.addEventListener('scroll', () => {
     const viewCenter = ul.scrollLeft + ul.clientWidth / 2;
     let bestIdx = 0;
     let bestDist = Infinity;
-    [...ul.children].forEach((item, idx) => {
+    items.forEach((item, idx) => {
       const itemCenter = item.offsetLeft + item.offsetWidth / 2;
       const dist = Math.abs(viewCenter - itemCenter);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIdx = idx;
-      }
+      if (dist < bestDist) { bestDist = dist; bestIdx = idx; }
     });
-    [...ul.children].forEach((item, idx) => {
-      item.classList.toggle('spotlight-active', idx === bestIdx);
-    });
-  }
+    if (bestIdx !== currentIndex) {
+      currentIndex = bestIdx;
+      applyActive(currentIndex);
+    }
+  }, { passive: true });
 
-  ul.addEventListener('scroll', updateSpotlight, { passive: true });
-  updateSpotlight();
+  setActive(0);
 }

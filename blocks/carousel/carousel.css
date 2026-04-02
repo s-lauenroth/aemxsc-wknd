@@ -32,11 +32,11 @@
   display: inline-flex;
   flex-direction: column;
   width: auto;
-  min-width: initial;
+  min-width: 0;
   max-width: initial;
   padding: 0px;
-  flex: 1 1 0%;
-  border:none;
+  flex: 0 0 calc(33.33% - 14px);
+  border: none;
 }
 .carousel-container .carousel-wrapper .carousel .cards-card-body {
   margin: auto;
@@ -82,7 +82,15 @@
   display: flex;
   gap: 20px;
   padding: 10px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
+.carousel > ul::-webkit-scrollbar {
+  display: none;
+}
+
 .carousel > ul > li {
   background: var(--background-color) 0 0 no-repeat padding-box;
   box-shadow: none;
@@ -92,7 +100,7 @@
   height: auto;
   min-height: auto;
   display: inline-flex;
-  flex: 1;
+  flex: 0 0 calc(33.33% - 14px);
   flex-direction: column;
   transition: transform 0.4s ease, opacity 0.4s ease;
   transform: scale(0.95);
@@ -100,7 +108,7 @@
 }
 
 .carousel > ul > li.spotlight-active {
-  transform: scale(1);
+  transform: scale(1.05);
   opacity: 1;
 }
 .carousel > ul > li .cards-card-image {
