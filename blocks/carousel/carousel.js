@@ -136,11 +136,23 @@ function initSpotlight(block) {
   if (realItems.length === 0) return;
   const count = realItems.length;
 
+  // Strip all AEM UE instrumentation from a clone so the editor
+  // does not treat it as the same content item as the original.
+  function stripInstrumentation(el) {
+    [el, ...el.querySelectorAll('*')].forEach((node) => {
+      [...node.attributes]
+        .filter((a) => a.name.startsWith('data-aue-') || a.name.startsWith('data-richtext-'))
+        .forEach((a) => node.removeAttribute(a.name));
+    });
+  }
+
   // One clone at each end — just enough for the peek during wrap transition
   const headClone = realItems[count - 1].cloneNode(true);
   const tailClone = realItems[0].cloneNode(true);
-  headClone.setAttribute('aria-hidden', 'true');
-  tailClone.setAttribute('aria-hidden', 'true');
+  [headClone, tailClone].forEach((clone) => {
+    clone.setAttribute('aria-hidden', 'true');
+    stripInstrumentation(clone);
+  });
   ul.prepend(headClone);
   ul.append(tailClone);
 
