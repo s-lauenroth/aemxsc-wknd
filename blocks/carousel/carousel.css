@@ -451,6 +451,35 @@
   object-position: center;
 }
 
+/* Nav buttons — high-visibility override */
+.carousel .button-container button.next,
+.carousel .button-container button.prev {
+  background-color: rgba(255, 255, 255, 0.92);
+  border: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carousel .button-container button.next:hover,
+.carousel .button-container button.prev:hover {
+  background-color: #ffffff;
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
+}
+
+.carousel .button-container button.next img,
+.carousel .button-container button.prev img {
+  filter: brightness(0);
+  width: 18px;
+  height: 18px;
+}
+
 /*buttons*/
 
 
