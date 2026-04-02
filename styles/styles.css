@@ -311,7 +311,8 @@
 
 body {
   display: none;
-  margin: 0;
+  margin: 0 auto;
+  max-width: 1920px;
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font-family);
@@ -609,6 +610,9 @@ main .cards-container {
 main > .section {
   margin: 40px 0;
   min-height: 50px;
+  max-width: 1920px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 main > .section > div {
