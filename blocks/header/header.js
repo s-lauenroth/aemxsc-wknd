@@ -604,12 +604,15 @@ export default async function decorate(block) {
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
   nav.prepend(hamburger);
   nav.setAttribute('aria-expanded', 'false');
-  // In the UE, force desktop layout and skip the resize listener to prevent
-  // the nav from reflowing every time the editor resizes its panels.
-  toggleMenu(nav, navSections, isAuthor ? true : isDesktop.matches);
-  if (!isAuthor) {
-    isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
-  }
+  // prevent mobile nav behavior on window resize
+  // Skip toggleMenu when running inside the Universal Editor — the UE sets
+  // data-aue-resource on the body before it starts resizing its panels, so
+  // this guard reliably suppresses reflowing caused by panel resize events.
+  toggleMenu(nav, navSections, isDesktop.matches);
+  isDesktop.addEventListener('change', () => {
+    if (document.body.hasAttribute('data-aue-resource')) return;
+    toggleMenu(nav, navSections, isDesktop.matches);
+  });
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
