@@ -37,6 +37,7 @@
   padding: 0px;
   flex: 0 0 calc(33.33% - 14px);
   border: none;
+  scroll-snap-align: center;
 }
 .carousel-container .carousel-wrapper .carousel .cards-card-body {
   margin: auto;
@@ -81,14 +82,21 @@
 .carousel > ul {
   display: flex;
   gap: 20px;
-  padding: 10px 0;
+  /* vertical padding + horizontal padding so first/last card can reach centre */
+  padding: 10px calc(33.33% + 7px);
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+  box-sizing: border-box;
 }
 
 .carousel > ul::-webkit-scrollbar {
   display: none;
+}
+
+.carousel > ul > li {
+  scroll-snap-align: center;
 }
 
 .carousel > ul > li {

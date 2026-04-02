@@ -136,6 +136,8 @@ function initSpotlight(block) {
   if (items.length === 0) return;
 
   let currentIndex = 0;
+  let isProgrammaticScroll = false;
+  let scrollEndTimer;
 
   function applyActive(idx) {
     items.forEach((item, i) => item.classList.toggle('spotlight-active', i === idx));
@@ -145,7 +147,10 @@ function initSpotlight(block) {
     const item = items[idx];
     if (!item) return;
     const target = item.offsetLeft - (ul.clientWidth - item.offsetWidth) / 2;
-    ul.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+    isProgrammaticScroll = true;
+    ul.scrollTo({ left: target, behavior: 'smooth' });
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(() => { isProgrammaticScroll = false; }, 600);
   }
 
   function setActive(idx) {
@@ -163,8 +168,9 @@ function initSpotlight(block) {
     fresh.addEventListener('click', () => setActive(cls === 'next' ? currentIndex + 1 : currentIndex - 1));
   });
 
-  // Update spotlight on touch/swipe scroll
+  // Only update spotlight from scroll when user is swiping (not programmatic)
   ul.addEventListener('scroll', () => {
+    if (isProgrammaticScroll) return;
     const viewCenter = ul.scrollLeft + ul.clientWidth / 2;
     let bestIdx = 0;
     let bestDist = Infinity;
