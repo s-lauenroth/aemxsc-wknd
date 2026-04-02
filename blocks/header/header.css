@@ -6,11 +6,6 @@ header .nav-wrapper {
   position: fixed;
 }
 
-/* Universal Editor: position:fixed breaks inside the UE iframe */
-body[data-aue-resource] header .nav-wrapper {
-  position: sticky;
-  top: 0;
-}
 
 header nav {
   box-sizing: border-box;

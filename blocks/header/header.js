@@ -605,16 +605,25 @@ export default async function decorate(block) {
   nav.prepend(hamburger);
   nav.setAttribute('aria-expanded', 'false');
 
-  // The Universal Editor loads the page inside an iframe and resizes it
-  // during initialisation — before any UE-specific attribute is set on the DOM.
-  // Detecting iframe context (window.self !== window.top) is the only signal
-  // available synchronously at this point. When in an iframe, force desktop
-  // layout and skip the matchMedia change listener so UE panel resizes never
-  // trigger a nav reflow.
-  const isInIframe = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
-  toggleMenu(nav, navSections, isInIframe ? true : isDesktop.matches);
-  if (!isInIframe) {
-    isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+  toggleMenu(nav, navSections, isDesktop.matches);
+
+  // Skip the matchMedia change listener in the Universal Editor — UE panel
+  // resizes cross the 900 px breakpoint and repeatedly call toggleMenu,
+  // causing the header to reflow. The UE adds 'adobe-ue-edit' / 'adobe-ue-preview'
+  // to <html>; check immediately and also watch via MutationObserver in case
+  // the class arrives slightly after decorate() runs.
+  const ueClasses = ['adobe-ue-edit', 'adobe-ue-preview'];
+  const inUE = () => ueClasses.some((c) => document.documentElement.classList.contains(c));
+  if (!inUE()) {
+    const desktopHandler = () => toggleMenu(nav, navSections, isDesktop.matches);
+    isDesktop.addEventListener('change', desktopHandler);
+    const ueObserver = new MutationObserver(() => {
+      if (inUE()) {
+        isDesktop.removeEventListener('change', desktopHandler);
+        ueObserver.disconnect();
+      }
+    });
+    ueObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
   const navWrapper = document.createElement('div');
