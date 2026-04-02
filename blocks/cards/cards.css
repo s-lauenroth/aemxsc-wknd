@@ -20,7 +20,7 @@
   overflow: hidden;
   padding: 0;
   display: inline-flex;
-  flex: 1 1 280px;
+  flex: 1 1 calc(25% - 36px);
   flex-direction: column;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
