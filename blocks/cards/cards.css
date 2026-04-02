@@ -83,14 +83,18 @@
   flex-direction: column;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
 }
-.cards > ul > li.image-top .cards-card-body h1 { font-size: 19px; }
-.cards > ul > li.image-top .cards-card-body p  { font-size: 14px; }
+.cards > ul > li.image-top .cards-card-body h1,
+.cards > ul > li.image-top .cards-card-body h2 { font-size: 19px; color: var(--text-light); }
+.cards > ul > li.image-top .cards-card-body p  { font-size: 14px; color: var(--text-color); }
 
 /* ── Variant: image-bottom ── */
 .cards > ul > li.image-bottom {
   flex-direction: column-reverse;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
 }
+.cards > ul > li.image-bottom .cards-card-body h1,
+.cards > ul > li.image-bottom .cards-card-body h2 { color: var(--text-light); }
+.cards > ul > li.image-bottom .cards-card-body p  { color: var(--text-color); }
 
 /* ── Variant: image-left ── */
 .cards > ul > li.image-left {
