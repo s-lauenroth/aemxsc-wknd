@@ -4,6 +4,27 @@
   padding: 0;
 }
 
+/* Overlay layout: image row fills the hero as background layer */
+.hero.overlay > div:first-child {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.hero.overlay > div:first-child > div {
+  width: 100%;
+  height: 100%;
+}
+
+.hero.overlay > div:first-child p {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .hero {
   position: relative;
   isolation: isolate;
@@ -26,11 +47,11 @@
     rgba(24, 24, 28, 0.35) 50%,
     rgba(24, 24, 28, 0.65) 100%
   );
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
 }
 
-.hero > div { position: relative; z-index: 1; }
+.hero > div { position: relative; z-index: 2; }
 
 /* ── Text ── */
 .hero h1,
@@ -72,15 +93,18 @@
 /* ── Background image ── */
 .hero picture {
   position: absolute;
-  z-index: -1;
   inset: 0;
+  z-index: 0;
+  display: block;
 }
 
-.hero img {
+.hero picture img,
+.hero > div:first-child img {
   object-fit: cover;
   object-position: center;
   width: 100%;
   height: 100%;
+  display: block;
 }
 
 /* ── Buttons ── */
