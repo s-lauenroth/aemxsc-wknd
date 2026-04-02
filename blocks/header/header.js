@@ -604,24 +604,17 @@ export default async function decorate(block) {
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
   nav.prepend(hamburger);
   nav.setAttribute('aria-expanded', 'false');
-  // prevent mobile nav behavior on window resize
-  toggleMenu(nav, navSections, isDesktop.matches);
-  const desktopChangeHandler = () => toggleMenu(nav, navSections, isDesktop.matches);
-  isDesktop.addEventListener('change', desktopChangeHandler);
 
-  // Remove the resize listener the moment the Universal Editor announces itself
-  // by setting data-aue-resource on the body. This prevents UE panel resizes
-  // from triggering toggleMenu and reflowing the header.
-  if (!document.body.hasAttribute('data-aue-resource')) {
-    const ueObserver = new MutationObserver(() => {
-      if (document.body.hasAttribute('data-aue-resource')) {
-        isDesktop.removeEventListener('change', desktopChangeHandler);
-        ueObserver.disconnect();
-      }
-    });
-    ueObserver.observe(document.body, { attributes: true, attributeFilter: ['data-aue-resource'] });
-  } else {
-    isDesktop.removeEventListener('change', desktopChangeHandler);
+  // The Universal Editor loads the page inside an iframe and resizes it
+  // during initialisation — before any UE-specific attribute is set on the DOM.
+  // Detecting iframe context (window.self !== window.top) is the only signal
+  // available synchronously at this point. When in an iframe, force desktop
+  // layout and skip the matchMedia change listener so UE panel resizes never
+  // trigger a nav reflow.
+  const isInIframe = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  toggleMenu(nav, navSections, isInIframe ? true : isDesktop.matches);
+  if (!isInIframe) {
+    isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
   }
 
   const navWrapper = document.createElement('div');
