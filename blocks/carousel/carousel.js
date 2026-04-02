@@ -136,25 +136,22 @@ function initSpotlight(block) {
   if (realItems.length === 0) return;
   const count = realItems.length;
 
-  // Clone the full set at each end: [copies | real | copies]
-  // This gives a full lap of navigation before the silent reset fires.
-  [...realItems].reverse().forEach((item) => {
-    const clone = item.cloneNode(true);
-    clone.setAttribute('aria-hidden', 'true');
-    ul.prepend(clone);
-  });
-  realItems.forEach((item) => {
-    const clone = item.cloneNode(true);
-    clone.setAttribute('aria-hidden', 'true');
-    ul.append(clone);
-  });
+  // One clone at each end — just enough for the peek during wrap transition
+  const headClone = realItems[count - 1].cloneNode(true);
+  const tailClone = realItems[0].cloneNode(true);
+  headClone.setAttribute('aria-hidden', 'true');
+  tailClone.setAttribute('aria-hidden', 'true');
+  ul.prepend(headClone);
+  ul.append(tailClone);
 
-  const items = [...ul.children]; // length = 3 * count
-  let currentIndex = count; // start at first real card (middle set)
+  // [cloneLast, real_0 … real_N-1, cloneFirst]
+  const items = [...ul.children];
+  let currentIndex = 1; // first real card
   let isProgrammaticScroll = false;
 
   function centerOf(idx) {
     const item = items[idx];
+    if (!item) return 0;
     return item.offsetLeft - (ul.clientWidth - item.offsetWidth) / 2;
   }
 
@@ -162,59 +159,48 @@ function initSpotlight(block) {
     items.forEach((item, i) => item.classList.toggle('spotlight-active', i === idx));
   }
 
-  // Instant jump without any visible flash:
-  // suppress transitions, set scrollLeft directly, restore next frame
+  // Flash-free instant reposition: kill transitions, move, restore after 2 frames
   function silentJump(idx) {
     ul.classList.add('no-transition');
     currentIndex = idx;
     applyActive(currentIndex);
-    ul.scrollLeft = centerOf(currentIndex);
+    ul.scrollLeft = Math.max(0, centerOf(currentIndex));
     requestAnimationFrame(() => requestAnimationFrame(() => {
       ul.classList.remove('no-transition');
       isProgrammaticScroll = false;
     }));
   }
 
-  function scrollToIndex(idx) {
-    const target = centerOf(idx);
-    isProgrammaticScroll = true;
-    ul.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
-
-    // Use scrollend when available, fall back to timeout
-    let handled = false;
-    const onEnd = () => {
-      if (handled) return;
-      handled = true;
-      // If we landed on a clone set, silently reset to the real set
-      if (currentIndex < count) {
-        silentJump(currentIndex + count);
-      } else if (currentIndex >= 2 * count) {
-        silentJump(currentIndex - count);
-      } else {
-        isProgrammaticScroll = false;
-      }
-    };
-    ul.addEventListener('scrollend', onEnd, { once: true });
-    setTimeout(onEnd, 700); // fallback for browsers without scrollend
-  }
-
-  function setActive(idx) {
+  function scrollTo(idx) {
     currentIndex = idx;
     applyActive(currentIndex);
-    scrollToIndex(currentIndex);
+    isProgrammaticScroll = true;
+    ul.scrollTo({ left: Math.max(0, centerOf(currentIndex)), behavior: 'smooth' });
+
+    // After scroll settles, jump from clone to real counterpart if needed
+    let handled = false;
+    const onSettled = () => {
+      if (handled) return;
+      handled = true;
+      if (currentIndex === 0) silentJump(count);           // clone of last → real last
+      else if (currentIndex === count + 1) silentJump(1);  // clone of first → real first
+      else isProgrammaticScroll = false;
+    };
+    ul.addEventListener('scrollend', onSettled, { once: true });
+    setTimeout(onSettled, 700); // fallback for browsers without scrollend
   }
 
-  // Replace buttons — remove slider.js handlers, never disable
+  // Replace buttons — strip slider.js handlers, never disable
   ['next', 'prev'].forEach((cls) => {
     const btn = block.querySelector(`button.${cls}`);
     if (!btn) return;
     const fresh = btn.cloneNode(true);
     fresh.disabled = false;
     btn.replaceWith(fresh);
-    fresh.addEventListener('click', () => setActive(cls === 'next' ? currentIndex + 1 : currentIndex - 1));
+    fresh.addEventListener('click', () => scrollTo(cls === 'next' ? currentIndex + 1 : currentIndex - 1));
   });
 
-  // Update spotlight on touch/swipe only
+  // Touch/swipe support
   ul.addEventListener('scroll', () => {
     if (isProgrammaticScroll) return;
     const viewCenter = ul.scrollLeft + ul.clientWidth / 2;
@@ -225,15 +211,12 @@ function initSpotlight(block) {
       const dist = Math.abs(viewCenter - itemCenter);
       if (dist < bestDist) { bestDist = dist; bestIdx = idx; }
     });
-    if (bestIdx !== currentIndex) {
-      currentIndex = bestIdx;
-      applyActive(currentIndex);
-    }
+    if (bestIdx !== currentIndex) { currentIndex = bestIdx; applyActive(currentIndex); }
   }, { passive: true });
 
-  // Init: position at first real card instantly
+  // Initialise at first real card with no animation
   ul.classList.add('no-transition');
-  ul.scrollLeft = centerOf(currentIndex);
+  ul.scrollLeft = Math.max(0, centerOf(currentIndex));
   applyActive(currentIndex);
   requestAnimationFrame(() => requestAnimationFrame(() => ul.classList.remove('no-transition')));
 }
