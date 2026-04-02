@@ -132,87 +132,43 @@ function initSpotlight(block) {
   const ul = block.querySelector('ul');
   if (!ul) return;
 
-  const realItems = [...ul.children];
-  if (realItems.length === 0) return;
-  const count = realItems.length;
-
-  // Strip all AEM UE instrumentation from a clone so the editor
-  // does not treat it as the same content item as the original.
-  function stripInstrumentation(el) {
-    [el, ...el.querySelectorAll('*')].forEach((node) => {
-      [...node.attributes]
-        .filter((a) => a.name.startsWith('data-aue-') || a.name.startsWith('data-richtext-'))
-        .forEach((a) => node.removeAttribute(a.name));
-    });
-  }
-
-  // One clone at each end — just enough for the peek during wrap transition
-  const headClone = realItems[count - 1].cloneNode(true);
-  const tailClone = realItems[0].cloneNode(true);
-  [headClone, tailClone].forEach((clone) => {
-    clone.setAttribute('aria-hidden', 'true');
-    stripInstrumentation(clone);
-  });
-  ul.prepend(headClone);
-  ul.append(tailClone);
-
-  // [cloneLast, real_0 … real_N-1, cloneFirst]
   const items = [...ul.children];
-  let currentIndex = 1; // first real card
-  let isProgrammaticScroll = false;
+  if (items.length === 0) return;
 
-  function centerOf(idx) {
-    const item = items[idx];
-    if (!item) return 0;
-    return item.offsetLeft - (ul.clientWidth - item.offsetWidth) / 2;
-  }
+  let currentIndex = 0;
+  let isProgrammaticScroll = false;
+  let scrollEndTimer;
 
   function applyActive(idx) {
     items.forEach((item, i) => item.classList.toggle('spotlight-active', i === idx));
   }
 
-  // Flash-free instant reposition: kill transitions, move, restore after 2 frames
-  function silentJump(idx) {
-    ul.classList.add('no-transition');
-    currentIndex = idx;
-    applyActive(currentIndex);
-    ul.scrollLeft = Math.max(0, centerOf(currentIndex));
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      ul.classList.remove('no-transition');
-      isProgrammaticScroll = false;
-    }));
-  }
-
-  function scrollTo(idx) {
-    currentIndex = idx;
-    applyActive(currentIndex);
+  function scrollToIndex(idx) {
+    const item = items[idx];
+    if (!item) return;
+    const target = item.offsetLeft - (ul.clientWidth - item.offsetWidth) / 2;
     isProgrammaticScroll = true;
-    ul.scrollTo({ left: Math.max(0, centerOf(currentIndex)), behavior: 'smooth' });
-
-    // After scroll settles, jump from clone to real counterpart if needed
-    let handled = false;
-    const onSettled = () => {
-      if (handled) return;
-      handled = true;
-      if (currentIndex === 0) silentJump(count);           // clone of last → real last
-      else if (currentIndex === count + 1) silentJump(1);  // clone of first → real first
-      else isProgrammaticScroll = false;
-    };
-    ul.addEventListener('scrollend', onSettled, { once: true });
-    setTimeout(onSettled, 700); // fallback for browsers without scrollend
+    ul.scrollTo({ left: target, behavior: 'smooth' });
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(() => { isProgrammaticScroll = false; }, 600);
   }
 
-  // Replace buttons — strip slider.js handlers, never disable
+  function setActive(idx) {
+    currentIndex = Math.max(0, Math.min(idx, items.length - 1));
+    applyActive(currentIndex);
+    scrollToIndex(currentIndex);
+  }
+
+  // Replace buttons so slider.js transform-based handlers are removed
   ['next', 'prev'].forEach((cls) => {
     const btn = block.querySelector(`button.${cls}`);
     if (!btn) return;
     const fresh = btn.cloneNode(true);
-    fresh.disabled = false;
     btn.replaceWith(fresh);
-    fresh.addEventListener('click', () => scrollTo(cls === 'next' ? currentIndex + 1 : currentIndex - 1));
+    fresh.addEventListener('click', () => setActive(cls === 'next' ? currentIndex + 1 : currentIndex - 1));
   });
 
-  // Touch/swipe support
+  // Only update spotlight from scroll when user is swiping (not programmatic)
   ul.addEventListener('scroll', () => {
     if (isProgrammaticScroll) return;
     const viewCenter = ul.scrollLeft + ul.clientWidth / 2;
@@ -223,12 +179,11 @@ function initSpotlight(block) {
       const dist = Math.abs(viewCenter - itemCenter);
       if (dist < bestDist) { bestDist = dist; bestIdx = idx; }
     });
-    if (bestIdx !== currentIndex) { currentIndex = bestIdx; applyActive(currentIndex); }
+    if (bestIdx !== currentIndex) {
+      currentIndex = bestIdx;
+      applyActive(currentIndex);
+    }
   }, { passive: true });
 
-  // Initialise at first real card with no animation
-  ul.classList.add('no-transition');
-  ul.scrollLeft = Math.max(0, centerOf(currentIndex));
-  applyActive(currentIndex);
-  requestAnimationFrame(() => requestAnimationFrame(() => ul.classList.remove('no-transition')));
+  setActive(0);
 }
