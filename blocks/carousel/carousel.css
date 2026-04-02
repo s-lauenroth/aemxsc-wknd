@@ -167,6 +167,7 @@
 }
 .carousel > ul > li.image-top .cards-card-body {
   background-color: rgb(83, 83, 92);
+  width: 100%;
 }
 .carousel > ul > li.image-top .cards-card-body h1 {
   margin: 0;
@@ -190,6 +191,7 @@
 }
 .carousel > ul > li.image-bottom .cards-card-body {
   background-color: rgb(83, 83, 92);
+  width: 100%;
 }
 .carousel > ul > li.image-bottom .cards-card-body h1 {
   margin: 0;
