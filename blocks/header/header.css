@@ -6,35 +6,10 @@ header .nav-wrapper {
   position: fixed;
 }
 
-/* Universal Editor: lock header into desktop layout to prevent resize thrash */
+/* Universal Editor: position:fixed breaks inside the UE iframe */
 body[data-aue-resource] header .nav-wrapper {
   position: sticky;
   top: 0;
-}
-
-body[data-aue-resource] header nav,
-body[data-aue-resource] header nav[aria-expanded='true'] {
-  display: flex;
-  height: var(--nav-height);
-  min-height: var(--nav-height);
-  overflow: visible;
-}
-
-body[data-aue-resource] header nav .nav-hamburger {
-  display: none;
-  visibility: hidden;
-}
-
-body[data-aue-resource] header nav .nav-sections,
-body[data-aue-resource] header nav[aria-expanded='true'] .nav-sections {
-  display: block !important;
-  visibility: visible !important;
-  position: static !important;
-  background: none !important;
-  height: auto !important;
-  width: auto !important;
-  padding: 0 !important;
-  top: auto !important;
 }
 
 header nav {
