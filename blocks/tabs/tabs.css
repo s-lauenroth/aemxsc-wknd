@@ -4,8 +4,9 @@
   max-width: 100%;
   font-size: var(--body-font-size-xs);
   overflow-x: auto;
-  border-bottom: 2px solid var(--light-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 0;
+  scrollbar-width: none;
 }
 
 @media (width >= 600px) {
@@ -24,27 +25,25 @@
   flex: 0 0 max-content;
   margin: 0;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   border-radius: 0;
-  padding: 16px 24px;
+  padding: 14px 20px;
   background-color: transparent;
-  color: var(--text-color);
-  font-family: var(--heading-font-family);
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: var(--body-font-family);
+  font-weight: 500;
   font-size: var(--body-font-size-s);
   line-height: 1.4;
   text-align: center;
-  text-overflow: unset;
-  overflow: unset;
   white-space: nowrap;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
-  position: relative;
+  letter-spacing: -0.01em;
 }
 
 .tabs .tabs-list button:hover {
-  background-color: var(--tab-background-color);
-  color: var(--link-hover-color);
+  background-color: transparent;
+  color: var(--text-light);
 }
 
 .tabs .tabs-list button p {
@@ -65,10 +64,10 @@
 
 .tabs .tabs-panel {
   margin-top: 0;
-  padding: 24px;
+  padding: 32px 0;
   border: none;
   overflow: auto;
-  background-color: var(--tab-background-color);
+  background-color: transparent;
 }
 
 @media (width >= 768px) {
@@ -90,8 +89,9 @@
 /* Card Style Tab Variant - Image Left, Text Right */
 .tabs.card-style-tab .tabs-panel {
   padding: 0;
-  background-color: var(--background-color);
-  box-shadow: 0 3px 20px rgba(0, 0, 0, 0.06);
+  background-color: var(--surface-color, #16161a);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
   overflow: hidden;
   display: flex;
