@@ -23,10 +23,10 @@
 
 :root {
   /* ── Dark theme colour palette ── */
-  --background-color:   var(--brand-background-color, #18181c);
-  --surface-color:      #222228;
-  --dark-color:         var(--brand-dark-color, #18181c);
-  --light-color:        var(--brand-light-color, #27272f);
+  --background-color:   var(--brand-background-color, #242428);
+  --surface-color:      #2e2e34;
+  --dark-color:         var(--brand-dark-color, #242428);
+  --light-color:        var(--brand-light-color, #35353d);
   --text-color:         var(--brand-text-color, #e8e8ea);
   --text-light:         var(--brand-light-text-color, #ffffff);
   --text-secondary:     #8e8e99;
@@ -36,14 +36,14 @@
   --main-accent-color:  var(--brand-theme-color, #a78bfa);
   --border-color:       rgba(255, 255, 255, 0.08);
 
-  --dark-color-opacity:  rgba(24, 24, 28, 0.82);
+  --dark-color-opacity:  rgba(36, 36, 40, 0.82);
   --light-color-opacity: rgba(255, 255, 255, 0.06);
   --tab-background-color: rgba(255, 255, 255, 0.03);
 
   /* nav / footer */
-  --nav-background-color:    var(--brand-nav-background-color,  rgba(24, 24, 28, 0.80));
+  --nav-background-color:    var(--brand-nav-background-color,  rgba(36, 36, 40, 0.80));
   --nav-text-color:          var(--brand-nav-text-color,         #f2f2f7);
-  --footer-background-color: var(--brand-footer-background-color, #111115);
+  --footer-background-color: var(--brand-footer-background-color, #1a1a1e);
   --footer-text-color:       var(--brand-footer-text-color,      #8e8e99);
 
   /* fonts */
