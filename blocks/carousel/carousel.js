@@ -125,4 +125,30 @@ export default function decorate(block) {
   block.parentNode.parentNode.prepend(leftContent);
   block.append(slider);
   createSlider(block);
+  initSpotlight(block);
+}
+
+function initSpotlight(block) {
+  const ul = block.querySelector('ul');
+  if (!ul) return;
+
+  function updateSpotlight() {
+    const viewCenter = ul.scrollLeft + ul.clientWidth / 2;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    [...ul.children].forEach((item, idx) => {
+      const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+      const dist = Math.abs(viewCenter - itemCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = idx;
+      }
+    });
+    [...ul.children].forEach((item, idx) => {
+      item.classList.toggle('spotlight-active', idx === bestIdx);
+    });
+  }
+
+  ul.addEventListener('scroll', updateSpotlight, { passive: true });
+  updateSpotlight();
 }

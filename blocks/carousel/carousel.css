@@ -94,8 +94,14 @@
   display: inline-flex;
   flex: 1;
   flex-direction: column;
-  display: inline-flex
-;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  transform: scale(0.95);
+  opacity: 0.75;
+}
+
+.carousel > ul > li.spotlight-active {
+  transform: scale(1);
+  opacity: 1;
 }
 .carousel > ul > li .cards-card-image {
   position: relative;
@@ -436,6 +442,12 @@
 
 /* Responsive Styles */
 @media (width < 1024px) {
+  .carousel > ul > li,
+  .carousel > ul > li.spotlight-active {
+    transform: none;
+    opacity: 1;
+  }
+
   .carousel-container .carousel-wrapper .carousel {
     padding: 0 5%;
   }
