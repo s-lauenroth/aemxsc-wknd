@@ -116,8 +116,12 @@
 }
 
 .carousel > ul > li.spotlight-active {
-  transform: scale(1.05);
+  transform: scale(1.1);
   opacity: 1;
+}
+
+.carousel > ul.no-transition > li {
+  transition: none !important;
 }
 .carousel > ul > li .cards-card-image {
   position: relative;
